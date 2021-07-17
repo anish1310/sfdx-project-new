@@ -1,0 +1,48 @@
+name: dx workflow
+
+
+on:
+  push:
+    branches: [ master ]
+    # Only trigger a workflow when changes have been made to files in the below mentioned path.
+    paths:
+     - "force-app/**"
+env:
+  SF_QA_ORG__AUTH_URL: ${{ secrets.SF_QA_ORG__AUTH_URL }}
+
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  
+  # This workflow contains a single job called "build"
+  Validate_To_ORG:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    container:
+      image: anish0613/sfdx-docker-img:latest
+      options: --user 0:0 --privileged
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - name: Authorize Org
+        run: |
+          sfdx force:auth:jwt:grant --clientid ${{ secrets.SFDC_CLIENTID }} --jwtkeyfile /etc/pki/tls/private/server.key --username ${{ secrets.SFDC_USERNAME }} --instanceurl ${{ secrets.SFDC_SERVERURL }} --setalias testorg
+      # Runs a single command using the runners shell
+      - name: Validate to the org
+        run: |
+          sfdx force:source:deploy -c -p $(git diff --name-only $(git describe --abbrev=0 --tags) | tr '\n' ',') -u testorg -w 10
+       # sfdx sgd:source:delta --from $(git describe --match "poc-*" --abbrev=0 --tags HEAD) --to HEAD --output . --ignore .forceignore
+        #  echo "--- package.xml generated with added and modified metadata from $(git describe --match "poc-*" --abbrev=0 --tags HEAD)---"
+         # cat package/package.xml
+        #  sfdx force:source:deploy -c -x package/package.xml
+     # - name: Deploy to the org
+      #  run: |
+      #    sfdx sgd:source:delta --from $(git describe --match "poc-*" --abbrev=0 --tags HEAD) --to HEAD --output . --ignore .forceignore
+      #    echo "--- package.xml generated with added and modified metadata from $(git describe --match "poc-*" --abbrev=0 --tags HEAD)---"
+      #    cat package/package.xml
+      #    sfdx force:source:deploy -x package/package.xml
+      - name: create tag
+        run: |
+          git tag poc-$(date +"%Y%m%d%H%M%S")
+          git push --tags
