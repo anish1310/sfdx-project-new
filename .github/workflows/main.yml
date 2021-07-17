@@ -33,11 +33,10 @@ jobs:
       # Runs a single command using the runners shell
       - name: Validate to the org
         run: |
-          sfdx force:source:deploy -c -p $(git diff --name-only $(git describe --abbrev=0 --tags) | tr '\n' ',') -u testorg -w 10
-       # sfdx sgd:source:delta --from $(git describe --match "poc-*" --abbrev=0 --tags HEAD) --to HEAD --output . --ignore .forceignore
-        #  echo "--- package.xml generated with added and modified metadata from $(git describe --match "poc-*" --abbrev=0 --tags HEAD)---"
-         # cat package/package.xml
-        #  sfdx force:source:deploy -c -x package/package.xml
+          sfdx sgd:source:delta --from $(git describe --match "poc-*" --abbrev=0 --tags HEAD) --to HEAD --output . --ignore .forceignore
+          echo "--- package.xml generated with added and modified metadata from $(git describe --match "poc-*" --abbrev=0 --tags HEAD)---"
+          cat package/package.xml
+          sfdx force:source:deploy -c -x package/package.xml
      # - name: Deploy to the org
       #  run: |
       #    sfdx sgd:source:delta --from $(git describe --match "poc-*" --abbrev=0 --tags HEAD) --to HEAD --output . --ignore .forceignore
