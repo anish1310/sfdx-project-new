@@ -29,7 +29,7 @@ jobs:
       
       - name: Authorize Org
         run: |
-          sfdx force:auth:jwt:grant --clientid ${{ secrets.SFDC_CLIENTID }} --jwtkeyfile /etc/pki/tls/private/server.key --username ${{ secrets.SFDC_USERNAME }} --instanceurl ${{ secrets.SFDC_SERVERURL }} --setalias testorg
+          sfdx force:auth:jwt:grant --clientid ${{ secrets.SFDC_CLIENTID }} --jwtkeyfile ${{ secrets.SFDC_SERVERKEY }} --username ${{ secrets.SFDC_USERNAME }} --instanceurl ${{ secrets.SFDC_SERVERURL }} --setalias testorg
       # Runs a single command using the runners shell
       - name: Validate to the org
         run: |
