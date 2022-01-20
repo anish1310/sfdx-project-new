@@ -3,4 +3,5 @@ public with sharing class AccountController {
     // A comment..
     // new comment
     //new comment
+    /// new comment
 }
